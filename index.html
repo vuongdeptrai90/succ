@@ -1,139 +1,449 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bộ Công Cụ Acc - All in One</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
-body{background:#0f172a;color:#f8fafc;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;padding:12px 16px;background:#1e293b;border-bottom:1px solid #334155}
-.burger{background:none;border:none;color:#f8fafc;font-size:26px;cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px}
-.burger:hover{background:#334155}
-.topbar h1{font-size:18px;color:#38bdf8}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:.25s;z-index:90}
-.overlay.show{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;left:0;bottom:0;width:270px;max-width:82vw;background:#1e293b;border-right:1px solid #334155;transform:translateX(-100%);transition:.25s;z-index:100;padding:18px 12px;overflow-y:auto}
-.drawer.show{transform:none}
-.drawer h2{color:#38bdf8;font-size:16px;padding:4px 10px 14px}
-.nav-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px;margin-bottom:6px;background:none;border:none;border-radius:8px;color:#cbd5e1;font-size:14px;font-weight:600;cursor:pointer}
-.nav-item:hover{background:#334155}
-.nav-item.active{background:#0284c7;color:#fff}
-main{max-width:1250px;margin:0 auto;padding:18px}
-.panel{display:none}
-.panel.active{display:block}
-.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:22px}
-.card h2{color:#38bdf8;text-align:center;margin-bottom:6px;font-size:22px}
-.desc{text-align:center;color:#94a3b8;font-size:13px;margin-bottom:18px}
-label.lb{display:block;font-weight:bold;color:#cbd5e1;margin:12px 0 6px;font-size:14px}
-textarea,input[type=text],input[type=number],select{width:100%;padding:11px 13px;background:#0f172a;color:#f8fafc;border:1px solid #475569;border-radius:8px;font-size:14px;outline:none}
-textarea{font-family:monospace;font-size:13px;height:170px;resize:vertical;color:#38bdf8}
-textarea:focus,input:focus,select:focus{border-color:#38bdf8}
-textarea[readonly]{color:#a7f3d0}
-.row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
-button.b{flex:1;min-width:130px;padding:11px 14px;border:none;border-radius:6px;font-size:14px;font-weight:bold;color:#fff;cursor:pointer;transition:.2s}
-button.b:hover{opacity:.85}
-.blue{background:#0284c7}.green{background:#10b981}.purple{background:#8b5cf6}.red{background:#ef4444}.cyan{background:#0891b2}
-.upload{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#0f172a;border:2px dashed #475569;border-radius:8px;padding:12px 16px;margin-bottom:12px}
-.upload input{display:none}
-.upload label{background:#0284c7;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:13px}
-.fname{font-size:13px;color:#94a3b8;font-style:italic}
-.stat{font-size:14px;color:#94a3b8;margin:8px 0}
-.stat b{color:#38bdf8}
-pre{background:#020617;color:#00ffaa;padding:14px;border-radius:10px;border:1px solid #334155;white-space:pre-wrap;word-break:break-all;max-height:380px;overflow:auto;font-size:13px}
-.ctl{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:768px){.ctl{grid-template-columns:1fr}}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0}
-.sc{background:#0f172a;border:1px solid #334155;border-left:4px solid #38bdf8;padding:9px;border-radius:6px;text-align:center}
-.sc h3{font-size:11px;color:#94a3b8;margin-bottom:3px}
-.sc div{font-size:18px;font-weight:bold}
-.tabs{display:flex;gap:6px;border-bottom:2px solid #334155;overflow-x:auto;padding-bottom:5px;margin-bottom:12px}
-.tab{padding:8px 14px;background:none;border:none;border-bottom:3px solid transparent;color:#94a3b8;cursor:pointer;font-weight:600;white-space:nowrap;font-size:12px}
-.tab.active{color:#38bdf8;border-bottom-color:#38bdf8}
-.hint{font-size:12px;color:#64748b;font-style:italic;margin-bottom:10px}
-.tbox{max-height:420px;overflow:auto;border:1px solid #334155;border-radius:8px;background:#0f172a}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #1e293b}
-th{background:#1e293b;color:#94a3b8;position:sticky;top:0}
-tbody tr{cursor:pointer}tbody tr:hover{background:#1e293b}
-input[type=checkbox]{width:16px;height:16px;cursor:pointer}
-.badge{padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;white-space:nowrap}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:200;padding:20px}
-.mc{background:#1e293b;border:1px solid #334155;border-radius:10px;width:100%;max-width:450px}
-.mh{padding:14px 20px;background:#0f172a;color:#38bdf8;display:flex;justify-content:space-between;align-items:center;border-radius:10px 10px 0 0}
-.mh button{background:none;border:none;color:#94a3b8;font-size:22px;cursor:pointer}
-.mb{padding:20px;font-size:14px;color:#cbd5e1;text-align:center}
-.mf{padding:14px 20px;background:#0f172a;display:flex;gap:10px;border-radius:0 0 10px 10px}
-.info{margin-bottom:8px;padding:8px 12px;background:#0f172a;border-radius:4px;border-left:3px solid #38bdf8;font-family:monospace;font-size:13px;text-align:left;word-break:break-all}
-.raw{background:#020617;color:#a7f3d0;padding:12px;border-radius:6px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;margin-top:10px;text-align:left}
-#toast{position:fixed;bottom:20px;right:20px;background:#10b981;color:#fff;padding:10px 18px;border-radius:6px;font-weight:bold;font-size:13px;display:none;z-index:300;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-#p-skin2{background:transparent;border:none;padding:0}
-#p-skin2 ::-webkit-scrollbar{width:4px;height:4px}
-#p-skin2 ::-webkit-scrollbar-track{background:#1e293b}
-#p-skin2 ::-webkit-scrollbar-thumb{background:#475569;border-radius:2px}
-#p-skin2 .ts2-stat-card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:10px;transition:all .2s;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
-#p-skin2 .ts2-stat-card:hover{border-color:#f59e0b;background:#26334d}
-#p-skin2 .ts2-stat-card.active{border-color:#f59e0b;background:#2b3856;box-shadow:0 0 10px rgba(245,158,11,.2)}
-#p-skin2 .ts2-card-bar{position:absolute;left:0;top:0;bottom:0;width:3px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Lọc Tài Khoản Garena / Liên Quân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
 </head>
-<body>
-<div class="topbar">
-  <button class="burger" onclick="toggleMenu()" aria-label="Menu">☰</button>
-  <h1 id="title">Check Skin</h1>
-</div>
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-<nav class="drawer" id="drawer">
-  <h2>🧰 Bộ Công Cụ Acc</h2>
-  <button class="nav-item active" data-t="skin" onclick="go('skin')">🔍 Check Skin</button>
-  <button class="nav-item" data-t="skin2" onclick="go('skin2')">🎮 Check Skin Chi Tiết</button>
-  <button class="nav-item" data-t="filter" onclick="go('filter')">🧹 Lọc User & Pass</button>
-  <button class="nav-item" data-t="json" onclick="go('json')">🔑 Tạo JSON Acc</button>
-  <button class="nav-item" data-t="shuffle" onclick="go('shuffle')">🔀 Xáo Trộn Acc</button>
-  <button class="nav-item" data-t="spam" onclick="go('spam')">💬 Tạo Nội Dung Spam</button>
-</nav>
-<main>
-<section class="panel active card" id="p-skin">
-  <h2>Kiểm Tra Skin & Tích Chọn Sao Chép</h2>
-  <p class="desc">Phân mốc chính xác từng khoảng • Tích chọn xuất file & sao chép hàng loạt</p>
-  <div class="upload">
-    <label for="sk-file">📁 Chọn File .txt Từ Máy Tính</label>
-    <input type="file" id="sk-file" accept=".txt">
-    <span class="fname" id="sk-fname">Chưa chọn file nào</span>
-  </div>
-  <textarea id="sk-in" style="height:120px" placeholder="Dán danh sách tài khoản vào đây..."></textarea>
-  <div class="ctl" style="margin-top:12px">
-    <input type="text" id="sk-search" placeholder="🔍 Tìm kiếm nhanh user hoặc password...">
-    <select id="sk-status"><option value="all">-- Tất cả Tình Trạng --</option></select>
-  </div>
-  <div class="row" style="margin-top:0">
-    <button class="b blue" onclick="skProcess()">🔍 Phân Tích</button>
-    <button class="b purple" onclick="skOpenCopy()">📋 Sao Chép Đã Chọn</button>
-    <button class="b green" onclick="skExport()">📥 Tải File Đang Lọc</button>
-    <button class="b red" onclick="skClear()">🗑️ Xóa Tất Cả</button>
-  </div>
-  <div class="stats-grid" id="sk-stats"></div>
-  <div class="tabs" id="sk-tabs"></div>
-  <div class="hint">💡 Tích chọn ô vuông từng acc hoặc bấm chọn tất cả. Click vào dòng acc để xem chi tiết.</div>
-  <div class="tbox"><table><thead><tr>
-    <th style="width:40px;text-align:center"><input type="checkbox" id="sk-all" onclick="skSelectAll(this)"></th>
-    <th>#</th><th>Tài Khoản / Mật Khẩu</th><th>Tên Ingame</th><th>Rank</th><th>Tướng</th><th>Skin</th><th>Tình Trạng</th>
-  </tr></thead><tbody id="sk-body"></tbody></table></div>
-</section>
-<section class="panel" id="p-skin2">
-    <div class="max-w-4xl mx-auto space-y-4 pt-1">
-        <div class="bg-slate-800/90 p-3.5 rounded-xl border border-slate-700 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+<body class="bg-slate-900 text-slate-200 min-h-screen font-sans">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-700 pb-4 gap-4">
             <div>
-                <h1 class="text-base font-bold text-amber-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-gamepad"></i> Check Skin Liên Quân
-                </h1>
-                <p class="text-slate-400 text-[11px]">Đã fix lỗi đếm chính xác số lượng từng bậc skin.</p>
+                <h1 class="text-2xl font-bold text-cyan-400">BỘ LỌC TÀI KHOẢN LIÊN QUÂN</h1>
+                <p class="text-sm text-slate-400">Lọc nhanh Acc Trắng SĐT, Trắng Mail, Sạch FB, CCCD & Skin hiếm</p>
             </div>
-            <div class="flex flex-wrap gap-1.5 w-full sm:w-auto">
-                <label class="flex-1 sm:flex-none px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-medium cursor-pointer flex items-center justify-center gap-1">
+            <div class="flex flex-wrap gap-2">
+                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Tải file .TXT lên
+                    <input type="file" id="fileInput" accept=".txt" class="hidden">
+                </label>
+                <button onclick="clearAll()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition">
+                    Xóa dữ liệu
+                </button>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg">
+            <div class="flex justify-between items-center mb-2">
+                <label class="text-sm font-semibold text-slate-300">Dữ liệu đầu vào (Dán danh sách vào đây hoặc tải file lên):</label>
+                <span id="totalLoaded" class="text-xs bg-slate-700 text-cyan-300 px-2.5 py-1 rounded-full font-mono">Tổng: 0 acc</span>
+            </div>
+            <textarea id="rawInput" rows="5" placeholder="Ví dụ: samquacuc20|khangho123 | Tên: BLUE V | LV: 30 | ... | Mail: Trắng | SĐT: Trắng | CCCD: Trắng | FB: Sạch FB"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-500"></textarea>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 pb-3">
+                <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Điều Kiện Lọc
+                </h2>
+                <!-- Preset Quick Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="applyPreset('trang_all')" class="text-xs bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 px-3 py-1 rounded-md transition">
+                        ⚡ Trắng SĐT + Trắng Mail
+                    </button>
+                    <button onclick="applyPreset('trang_sdt')" class="text-xs bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-600/30 px-3 py-1 rounded-md transition">
+                        📱 Chỉ Trắng SĐT
+                    </button>
+                    <button onclick="applyPreset('trang_mail')" class="text-xs bg-amber-600/20 text-amber-400 border border-amber-500/30 hover:bg-amber-600/30 px-3 py-1 rounded-md transition">
+                        ✉️ Chỉ Trắng Mail
+                    </button>
+                    <button onclick="applyPreset('reset')" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-md transition">
+                        Mặc định
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- SĐT -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Số Điện Thoại (SĐT)</label>
+                    <select id="filterPhone" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="all">Tất cả</option>
+                        <option value="blank" selected>Trắng (Chưa có SĐT)</option>
+                        <option value="has">Đã có SĐT (****xxxx)</option>
+                    </select>
+                </div>
+
+                <!-- Mail -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Email</label>
+                    <select id="filterMail" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="all">Tất cả</option>
+                        <option value="blank">Trắng (Chưa có Mail)</option>
+                        <option value="has">Đã có Mail</option>
+                        <option value="waf">Lỗi Garena WAF</option>
+                    </select>
+                </div>
+
+                <!-- CCCD -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">CCCD</label>
+                    <select id="filterCCCD" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="all">Tất cả</option>
+                        <option value="blank">Trắng (Chưa CCCD)</option>
+                        <option value="has">Đã dính CCCD</option>
+                    </select>
+                </div>
+
+                <!-- Facebook -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Liên kết Facebook</label>
+                    <select id="filterFB" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="all">Tất cả</option>
+                        <option value="clean">Sạch FB</option>
+                        <option value="linked">Dính FB</option>
+                    </select>
+                </div>
+
+                <!-- Min Level -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Level tối thiểu (LV >=)</label>
+                    <input type="number" id="filterMinLv" value="0" min="0" max="30" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                </div>
+
+                <!-- Min Skins -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Số Skin tối thiểu (>=)</label>
+                    <input type="number" id="filterMinSkin" value="0" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                </div>
+
+                <!-- Rank -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Rank</label>
+                    <select id="filterRank" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="all">Tất cả Rank</option>
+                        <option value="Cao Thủ">Cao Thủ</option>
+                        <option value="T.Anh">Tinh Anh</option>
+                        <option value="K.Cương">Kim Cương</option>
+                        <option value="B.Kim">Bạch Kim</option>
+                        <option value="Vàng">Vàng</option>
+                        <option value="Bạc">Bạc</option>
+                        <option value="Đồng">Đồng</option>
+                        <option value="Chưa">Chưa có / Chưa vào game</option>
+                    </select>
+                </div>
+
+                <!-- Tìm kiếm Skin / Từ khóa -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Tìm tên Skin / Từ khóa</label>
+                    <input type="text" id="filterKeyword" placeholder="VD: Murad, Violet, Gojo..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none">
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-base font-semibold text-white">Kết Quả Lọc</h2>
+                    <span id="filteredCount" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-0.5 rounded-full text-sm font-bold">
+                        0 acc
+                    </span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="copyResults('full')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                        📋 Copy Full Dòng
+                    </button>
+                    <button onclick="copyResults('userpass')" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                        🔑 Copy User|Pass
+                    </button>
+                    <button onclick="downloadTxt('full')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                        💾 Tải TXT (Full)
+                    </button>
+                    <button onclick="downloadTxt('userpass')" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                        💾 Tải TXT (User|Pass)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Output -->
+            <div class="overflow-x-auto max-h-[500px] border border-slate-700 rounded-lg">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-900 text-slate-300 sticky top-0 z-10">
+                        <tr>
+                            <th class="p-3 border-b border-slate-700 w-10">#</th>
+                            <th class="p-3 border-b border-slate-700">Tài Khoản | Mật Khẩu</th>
+                            <th class="p-3 border-b border-slate-700">Tên Ingame</th>
+                            <th class="p-3 border-b border-slate-700">LV / Rank</th>
+                            <th class="p-3 border-b border-slate-700">Tướng / Skin</th>
+                            <th class="p-3 border-b border-slate-700">Mail</th>
+                            <th class="p-3 border-b border-slate-700">SĐT</th>
+                            <th class="p-3 border-b border-slate-700">CCCD / FB</th>
+                            <th class="p-3 border-b border-slate-700">Skins Hiếm</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultTableBody" class="divide-y divide-slate-700/60 font-mono">
+                        <tr>
+                            <td colspan="9" class="p-8 text-center text-slate-500">Chưa có dữ liệu. Hãy dán danh sách hoặc tải file .txt lên.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-sm font-medium transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        Đã sao chép!
+    </div>
+
+    <script>
+        let parsedAccounts = [];
+        let filteredAccounts = [];
+
+        const rawInput = document.getElementById('rawInput');
+        const fileInput = document.getElementById('fileInput');
+
+        // Lắng nghe sự kiện thay đổi bộ lọc
+        const filterIds = ['filterPhone', 'filterMail', 'filterCCCD', 'filterFB', 'filterMinLv', 'filterMinSkin', 'filterRank', 'filterKeyword'];
+        filterIds.forEach(id => {
+            document.getElementById(id).addEventListener('input', applyFilters);
+            document.getElementById(id).addEventListener('change', applyFilters);
+        });
+
+        // Lắng nghe dán text
+        rawInput.addEventListener('input', () => {
+            parseData(rawInput.value);
+            applyFilters();
+        });
+
+        // Lắng nghe tải file
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                rawInput.value = event.target.result;
+                parseData(event.target.result);
+                applyFilters();
+                showToast(`Đã tải file "${file.name}" thành công!`);
+            };
+            reader.readAsText(file, 'UTF-8');
+        });
+
+        // Phân tích từng dòng dữ liệu theo cấu trúc file mẫu
+        function parseData(text) {
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            parsedAccounts = lines.map(line => {
+                // Loại bỏ tag nếu có khi copy từ nguồn ngoài
+                const cleanLine = line.replace(/^\/i, '').trim();
+                const parts = cleanLine.split('|').map(p => p.trim());
+
+                const user = parts[0] || '';
+                const pass = parts[1] || '';
+
+                const getField = (prefix) => {
+                    const found = parts.find(p => p.startsWith(prefix));
+                    return found ? found.substring(prefix.length).trim() : '';
+                };
+
+                const name = getField('Tên:');
+                const lv = parseInt(getField('LV:')) || 0;
+                const rank = getField('Rank:');
+                const champs = parseInt(getField('Tướng:')) || 0;
+                const skinsCount = parseInt(getField('Skin:')) || 0;
+                const mail = getField('Mail:');
+                const phone = getField('SĐT:');
+                const cccd = getField('CCCD:');
+                const fb = getField('FB:');
+                
+                // Lấy toàn bộ phần Skins: (có thể chứa nhiều dấu | bên trong nếu có Anime | SS | SSS)
+                const skinIdx = cleanLine.indexOf('Skins:');
+                const rareSkins = skinIdx !== -1 ? cleanLine.substring(skinIdx + 6).trim() : '';
+
+                return {
+                    raw: cleanLine,
+                    userPass: `${user}|${pass}`,
+                    user, pass, name, lv, rank, champs, skinsCount, mail, phone, cccd, fb, rareSkins
+                };
+            });
+
+            document.getElementById('totalLoaded').textContent = `Tổng: ${parsedAccounts.length} acc`;
+        }
+
+        // Áp dụng các điều kiện lọc
+        function applyFilters() {
+            const fPhone = document.getElementById('filterPhone').value;
+            const fMail = document.getElementById('filterMail').value;
+            const fCCCD = document.getElementById('filterCCCD').value;
+            const fFB = document.getElementById('filterFB').value;
+            const fMinLv = parseInt(document.getElementById('filterMinLv').value) || 0;
+            const fMinSkin = parseInt(document.getElementById('filterMinSkin').value) || 0;
+            const fRank = document.getElementById('filterRank').value;
+            const fKeyword = document.getElementById('filterKeyword').value.toLowerCase().trim();
+
+            filteredAccounts = parsedAccounts.filter(acc => {
+                // 1. Lọc SĐT
+                if (fPhone === 'blank' && acc.phone !== 'Trắng') return false;
+                if (fPhone === 'has' && (acc.phone === 'Trắng' || acc.phone === '')) return false;
+
+                // 2. Lọc Mail
+                if (fMail === 'blank' && acc.mail !== 'Trắng') return false;
+                if (fMail === 'has' && (acc.mail === 'Trắng' || acc.mail.includes('WAF') || acc.mail === '')) return false;
+                if (fMail === 'waf' && !acc.mail.includes('WAF')) return false;
+
+                // 3. Lọc CCCD
+                if (fCCCD === 'blank' && acc.cccd !== 'Trắng') return false;
+                if (fCCCD === 'has' && (acc.cccd === 'Trắng' || acc.cccd === '')) return false;
+
+                // 4. Lọc FB
+                if (fFB === 'clean' && acc.fb !== 'Sạch FB') return false;
+                if (fFB === 'linked' && acc.fb !== 'Dính FB') return false;
+
+                // 5. Lọc LV & Skin
+                if (acc.lv < fMinLv) return false;
+                if (acc.skinsCount < fMinSkin) return false;
+
+                // 6. Lọc Rank
+                if (fRank !== 'all' && !acc.rank.includes(fRank)) return false;
+
+                // 7. Tìm từ khóa
+                if (fKeyword && !acc.raw.toLowerCase().includes(fKeyword)) return false;
+
+                return true;
+            });
+
+            renderTable();
+        }
+
+        // Hiển thị kết quả ra bảng (giới hạn 500 dòng đầu trên giao diện để tránh lag trình duyệt, xuất file vẫn đủ 100%)
+        function renderTable() {
+            const tbody = document.getElementById('resultTableBody');
+            document.getElementById('filteredCount').textContent = `${filteredAccounts.length} acc`;
+
+            if (filteredAccounts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-500">Không tìm thấy tài khoản nào khớp điều kiện lọc.</td></tr>`;
+                return;
+            }
+
+            const displayLimit = filteredAccounts.slice(0, 500);
+            let html = displayLimit.map((acc, index) => {
+                const phoneBadge = acc.phone === 'Trắng' 
+                    ? `<span class="bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded">Trắng</span>` 
+                    : `<span class="text-rose-400">${acc.phone}</span>`;
+
+                const mailBadge = acc.mail === 'Trắng'
+                    ? `<span class="bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded">Trắng</span>`
+                    : acc.mail.includes('WAF')
+                        ? `<span class="text-amber-400">WAF</span>`
+                        : `<span class="text-slate-300">${acc.mail}</span>`;
+
+                const fbBadge = acc.fb === 'Sạch FB'
+                    ? `<span class="text-emerald-400">Sạch FB</span>`
+                    : `<span class="text-rose-400">Dính FB</span>`;
+
+                const cccdBadge = acc.cccd === 'Trắng'
+                    ? `<span class="text-emerald-400">Trắng</span>`
+                    : `<span class="text-amber-400">${acc.cccd}</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-700/40 transition">
+                        <td class="p-2.5 text-slate-500">${index + 1}</td>
+                        <td class="p-2.5 text-cyan-300 font-semibold select-all">${escapeHtml(acc.userPass)}</td>
+                        <td class="p-2.5 text-slate-200">${escapeHtml(acc.name)}</td>
+                        <td class="p-2.5">LV.${acc.lv} <span class="text-slate-400">(${acc.rank})</span></td>
+                        <td class="p-2.5 text-amber-300">${acc.champs}T / ${acc.skinsCount}S</td>
+                        <td class="p-2.5">${mailBadge}</td>
+                        <td class="p-2.5">${phoneBadge}</td>
+                        <td class="p-2.5">${cccdBadge} | ${fbBadge}</td>
+                        <td class="p-2.5 text-purple-300 max-w-xs truncate" title="${escapeHtml(acc.rareSkins)}">${escapeHtml(acc.rareSkins || '-')}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (filteredAccounts.length > 500) {
+                html += `<tr><td colspan="9" class="p-3 text-center text-amber-400 bg-slate-900/50">Đang hiển thị 500 / ${filteredAccounts.length} tài khoản. Bấm Copy hoặc Tải TXT để lấy toàn bộ danh sách!</td></tr>`;
+            }
+
+            tbody.innerHTML = html;
+        }
+
+        // Các nút chọn nhanh
+        function applyPreset(type) {
+            if (type === 'trang_all') {
+                document.getElementById('filterPhone').value = 'blank';
+                document.getElementById('filterMail').value = 'blank';
+            } else if (type === 'trang_sdt') {
+                document.getElementById('filterPhone').value = 'blank';
+                document.getElementById('filterMail').value = 'all';
+            } else if (type === 'trang_mail') {
+                document.getElementById('filterPhone').value = 'all';
+                document.getElementById('filterMail').value = 'blank';
+            } else if (type === 'reset') {
+                document.getElementById('filterPhone').value = 'all';
+                document.getElementById('filterMail').value = 'all';
+                document.getElementById('filterCCCD').value = 'all';
+                document.getElementById('filterFB').value = 'all';
+                document.getElementById('filterMinLv').value = 0;
+                document.getElementById('filterMinSkin').value = 0;
+                document.getElementById('filterRank').value = 'all';
+                document.getElementById('filterKeyword').value = '';
+            }
+            applyFilters();
+        }
+
+        // Copy kết quả
+        function copyResults(mode) {
+            if (filteredAccounts.length === 0) return showToast('Không có dữ liệu để copy!');
+            const text = filteredAccounts.map(acc => mode === 'userpass' ? acc.userPass : acc.raw).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`Đã copy ${filteredAccounts.length} tài khoản (${mode === 'userpass' ? 'User|Pass' : 'Full'})!`);
+            });
+        }
+
+        // Tải file TXT
+        function downloadTxt(mode) {
+            if (filteredAccounts.length === 0) return showToast('Không có dữ liệu để tải!');
+            const text = filteredAccounts.map(acc => mode === 'userpass' ? acc.userPass : acc.raw).join('\n');
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `loc_acc_${mode}_${filteredAccounts.length}acc.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAll() {
+            rawInput.value = '';
+            fileInput.value = '';
+            parsedAccounts = [];
+            filteredAccounts = [];
+            document.getElementById('totalLoaded').textContent = 'Tổng: 0 acc';
+            renderTable();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
+:flex-none px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-medium cursor-pointer flex items-center justify-center gap-1">
                     <i class="fa-solid fa-upload"></i> Úp File
                     <input type="file" id="ts2-fileInput" accept=".txt" class="hidden" onchange="ts2UploadFile(event)">
                 </label>
