@@ -425,11 +425,11 @@
           </label>
         </div>
         <div class="field" style="grid-column:1/-1;">
-          <label for="excludeMailDomains"><strong>Loại acc theo đuôi Gmail / Email</strong></label>
+          <label for="excludeMailDomains"><strong>Loại acc theo đuôi mail</strong></label>
           <select id="excludeMailDomains" multiple size="5" style="width:100%; min-height:110px;">
             <option disabled>Nhập hoặc tải danh sách để nhận diện miền email...</option>
           </select>
-          <small>Chọn một hoặc nhiều miền để loại acc tương ứng. Ví dụ: gmail.com, reg02.top, tuimu.shop. Danh sách tự lấy từ cột Mail.</small>
+          <small>Chọn một hoặc nhiều phần đuôi sau dấu @. Ví dụ: gmail, reg02.top, outlook. Danh sách tự lấy từ cột Mail.</small>
         </div>
       </div>
 
@@ -696,10 +696,10 @@ newguydud|vip641799 | Tên: newguydud | LV: 12 | Ngày tạo: 18:44:13 05/07/202
       );
       const domainCounts = new Map();
       parsedAll.forEach(acc => {
-        const match = String(acc.mail || "").match(/@([a-z0-9.-]+\.[a-z]{2,})\b/i);
+        const match = String(acc.mail || "").match(/@([a-z0-9.-]+)/i);
         if (match) {
-          const domain = match[1].toLowerCase();
-          domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
+          const domain = match[1].toLowerCase().replace(/\.+$/, "");
+          if (domain) domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
         }
       });
       const sortedDomains = Array.from(domainCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
@@ -735,8 +735,11 @@ newguydud|vip641799 | Tên: newguydud | LV: 12 | Ngày tạo: 18:44:13 05/07/202
 
       let filtered = parsedAll.filter((acc) => {
         // Loại acc theo miền email được chọn.
-        const mailDomainMatch = String(acc.mail || "").match(/@([a-z0-9.-]+\.[a-z]{2,})\b/i);
-        if (mailDomainMatch && excludedMailDomains.has(mailDomainMatch[1].toLowerCase())) return false;
+        const mailDomainMatch = String(acc.mail || "").match(/@([a-z0-9.-]+)/i);
+        if (mailDomainMatch) {
+          const mailSuffix = mailDomainMatch[1].toLowerCase().replace(/\.+$/, "");
+          if (Array.from(excludedMailDomains).some(suffix => mailSuffix === suffix || mailSuffix.startsWith(suffix + "."))) return false;
+        }
         // Loại toàn bộ acc có chi tiết phân loại Skin SS hoặc SSS.
         if (excludeSSAccounts && /\bSSS?\b/i.test(acc.skinsDetail)) return false;
         if (infoMode === "blank_all" && !acc.blankAll) return false;
