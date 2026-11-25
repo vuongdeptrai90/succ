@@ -424,6 +424,13 @@
             <strong>Loại acc có Skin SS/SSS</strong>
           </label>
         </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label for="excludeMailDomains"><strong>Loại acc theo đuôi Gmail / Email</strong></label>
+          <select id="excludeMailDomains" multiple size="5" style="width:100%; min-height:110px;">
+            <option disabled>Nhập hoặc tải danh sách để nhận diện miền email...</option>
+          </select>
+          <small>Chọn một hoặc nhiều miền để loại acc tương ứng. Ví dụ: gmail.com, reg02.top, tuimu.shop. Danh sách tự lấy từ cột Mail.</small>
+        </div>
       </div>
 
       <div class="quick-row">
@@ -526,6 +533,7 @@ newguydud|vip641799 | Tên: newguydud | LV: 12 | Ngày tạo: 18:44:13 05/07/202
     const onlyDetailSkinsEl = document.getElementById("onlyDetailSkins");
     const hideExistingSkinsEl = document.getElementById("hideExistingSkins");
     const excludeSSAccountsEl = document.getElementById("excludeSSAccounts");
+    const excludeMailDomainsEl = document.getElementById("excludeMailDomains");
     const resultBodyEl = document.getElementById("resultBody");
     const rawOutputEl = document.getElementById("rawOutput");
     const toastEl = document.getElementById("toast");
@@ -682,6 +690,35 @@ newguydud|vip641799 | Tên: newguydud | LV: 12 | Ngày tạo: 18:44:13 05/07/202
       const lines = rawInputEl.value.split(/\r?\n/);
       const parsedAll = lines.map(parseLine).filter(Boolean);
 
+      // Tự nhận diện các miền email đang có trong dữ liệu.
+      const previouslySelected = new Set(
+        Array.from(excludeMailDomainsEl.selectedOptions).map(option => option.value)
+      );
+      const domainCounts = new Map();
+      parsedAll.forEach(acc => {
+        const match = String(acc.mail || "").match(/@([a-z0-9.-]+\.[a-z]{2,})\b/i);
+        if (match) {
+          const domain = match[1].toLowerCase();
+          domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
+        }
+      });
+      const sortedDomains = Array.from(domainCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+      excludeMailDomainsEl.innerHTML = "";
+      if (!sortedDomains.length) {
+        const option = document.createElement("option");
+        option.disabled = true;
+        option.textContent = "Không tìm thấy miền email trong dữ liệu";
+        excludeMailDomainsEl.appendChild(option);
+      } else {
+        sortedDomains.forEach(([domain, count]) => {
+          const option = document.createElement("option");
+          option.value = domain;
+          option.textContent = `${domain} (${count} acc)`;
+          option.selected = previouslySelected.has(domain);
+          excludeMailDomainsEl.appendChild(option);
+        });
+      }
+
       const infoMode = infoFilterEl.value;
       const minSkin = Math.max(0, parseInt(minSkinEl.value || "0", 10));
       const minLv = Math.max(0, parseInt(minLvEl.value || "0", 10));
@@ -691,9 +728,15 @@ newguydud|vip641799 | Tên: newguydud | LV: 12 | Ngày tạo: 18:44:13 05/07/202
       const onlyDetail = onlyDetailSkinsEl.checked;
       const hideSkins = hideExistingSkinsEl.checked;
       const excludeSSAccounts = excludeSSAccountsEl.checked;
+      const excludedMailDomains = new Set(
+        Array.from(excludeMailDomainsEl.selectedOptions).map(option => option.value.toLowerCase())
+      );
       const sortBy = sortByEl.value;
 
       let filtered = parsedAll.filter((acc) => {
+        // Loại acc theo miền email được chọn.
+        const mailDomainMatch = String(acc.mail || "").match(/@([a-z0-9.-]+\.[a-z]{2,})\b/i);
+        if (mailDomainMatch && excludedMailDomains.has(mailDomainMatch[1].toLowerCase())) return false;
         // Loại toàn bộ acc có chi tiết phân loại Skin SS hoặc SSS.
         if (excludeSSAccounts && /\bSSS?\b/i.test(acc.skinsDetail)) return false;
         if (infoMode === "blank_all" && !acc.blankAll) return false;
@@ -845,7 +888,7 @@ newguydud|vip641799 | Tên: newguydud | LV: 12 | Ngày tạo: 18:44:13 05/07/202
       runFilter();
     });
 
-    [infoFilterEl, minSkinEl, minLvEl, maxLvEl, keywordEl, sortByEl, onlyDetailSkinsEl, hideExistingSkinsEl, excludeSSAccountsEl].forEach((el) => {
+    [infoFilterEl, minSkinEl, minLvEl, maxLvEl, keywordEl, sortByEl, onlyDetailSkinsEl, hideExistingSkinsEl, excludeSSAccountsEl, excludeMailDomainsEl].forEach((el) => {
       el.addEventListener("input", runFilter);
       el.addEventListener("change", runFilter);
     });
